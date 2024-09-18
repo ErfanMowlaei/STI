@@ -1,8 +1,8 @@
 '''
 Sample calls:
-python3 STICI_V1.1.py --mode train --which-chunk 1 --save-dir ./alaki --ref ./data/STI_benchmark_datasets/ALL.chr22.training.samples.100k.any.type.0.01.maf.variants.vcf.gz --min-mr 0.85 --max-mr 0.95 --cs 2048 --sites-per-model 10240 --co 64 --na-heads 16 --embed-dim 128 --batch-size-per-gpu 8 --tihp 1 --lr 0.002 --restart-training 1 --verbose 1
-python3 STICI_V1.1.py --save-dir ./alaki --ref ./data/test_purpose_datasets/Chr22_Dels_train_fold_1.vcf --min-mr 0.8 --max-mr 0.8 --na-heads 16 --embed-dim 128 --batch-size-per-gpu 32 --tihp 1 --verbose 1 --cs 2048 --co 64 --sites-per-model 10240 --lr 0.002 --restart-training 1
-python3 STICI_V1.1.py --save-dir ./alaki --ref ./data/test_purpose_datasets/Chr22_SVs_train_fold_1.vcf --min-mr 0.8 --max-mr 0.8 --na-heads 16 --embed-dim 128 --batch-size-per-gpu 32 --tihp 1 --verbose 1 --cs 2048 --co 64 --sites-per-model 10240 --lr 0.002 --restart-training 1
+python3 STICI_V1.1.py --mode train --which-chunk 1 --save-dir ./alaki --ref ./data/STI_benchmark_datasets/ALL.chr22.training.samples.100k.any.type.0.01.maf.variants.vcf.gz --min-mr 0.85 --max-mr 0.95 --cs 2048 --sites-per-model 10240 --co 64 --na-heads 16 --embed-dim 128 --batch-size-per-gpu 4 --tihp 1 --lr 0.002 --restart-training 1 --verbose 1
+python3 STICI_V1.1.py --save-dir ./alaki --ref ./data/test_purpose_datasets/Chr22_Dels_train_fold_1.vcf --min-mr 0.8 --max-mr 0.8 --na-heads 16 --embed-dim 128 --batch-size-per-gpu 4 --tihp 1 --verbose 1 --cs 2048 --co 64 --sites-per-model 10240 --lr 0.002 --restart-training 1
+python3 STICI_V1.1.py --save-dir ./alaki --ref ./data/test_purpose_datasets/Chr22_SVs_train_fold_1.vcf --min-mr 0.8 --max-mr 0.8 --na-heads 16 --embed-dim 128 --batch-size-per-gpu 4 --tihp 1 --verbose 1 --cs 2048 --co 64 --sites-per-model 10240 --lr 0.002 --restart-training 1
 '''
 
 import argparse
@@ -1363,8 +1363,8 @@ def main():
     parser.add_argument('--embed-dim', type=int, required=False, help='Embedding dimension size (default 128)',
                         default=128)
     parser.add_argument('--lr', type=float, required=False, help='Learning Rate (default 0.0005)', default=0.0005)
-    parser.add_argument('--batch-size-per-gpu', type=int, required=False, help='Batch size per gpu (default 16)',
-                        default=16)
+    parser.add_argument('--batch-size-per-gpu', type=int, required=False, help='Batch size per gpu (default 4)',
+                        default=4)
     parser.add_argument('--use-r2', type=str,
                         help='Whether to use R^2 loss (default=True).',
                         choices=['false', 'true', '0', '1'], default='1')
