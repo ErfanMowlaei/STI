@@ -459,7 +459,6 @@ class ImputationLoss(tf.keras.losses.Loss):
                 pred_alt_allele_probs = tf.reduce_sum(y_pred_grouped[i][:, :, 1:], axis=-1)
                 r2_loss += -tf.reduce_sum(self.calculate_Minimac_R2(pred_alt_allele_probs, gt_alt_af)) * tf.cast(group_size, tf.float32)
 
-            # Handle the remainder samples if any
             if num_remainder_samples > 0:
                 remainder_start_index = num_full_groups * group_size
                 y_true_remainder = y_true[remainder_start_index:]
