@@ -4,7 +4,7 @@ Split-Transformer with Integrated Convolutions for Imputation source code
 ## Model architecture
 
 <p align="center">
-  <img width="100%" height="auto" src="https://github.com/ErfanMowlaei/STICI/blob/main/architecture.png">
+  <img width="100%" height="auto" src="[https://github.com/ErfanMowlaei/STICI/blob/main/architecture.png](https://github.com/ErfanMowlaei/STICI/blob/09c0937bf1c3794bc067010a833cebaa98f40054/architecture.png)">
 </p>
 
 ## Overal workflow of STICI in pseudocode
