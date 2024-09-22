@@ -19,7 +19,6 @@ MIN_MAF = 0.01
 N_VARIANTS=10240*3
 
 def filter_snps(mafs, tsk, min_maf=MIN_MAF, num_to_draw=N_VARIANTS):
-    # Keep bi-allelic non-indel sites
     valid_indices = set()
     for i in tqdm(range(len(allele_frequencies))):
         site = tsk.site(i)
@@ -28,14 +27,11 @@ def filter_snps(mafs, tsk, min_maf=MIN_MAF, num_to_draw=N_VARIANTS):
         # if ref and len(ref) == 1 and alt and len(alt) == 1:
         if ref and alt and len(alt) == 1:
             valid_indices.add(i)
-    # Filter for SNVs with MAF greater than min_maf
     filtered_indices = np.array(list(sorted(list(set(list(np.where(mafs > min_maf)[0])) & valid_indices))))
     if len(filtered_indices) >= num_to_draw:
         filtered_indices = filtered_indices[:num_to_draw]
-      
     return filtered_indices, mafs
 
-# Load the Homo sapiens species, genome, and demographic model
 species = stdpopsim.get_species(SPECIES)
 model = species.get_demographic_model(DEMO_MODEL)
 contig = species.get_contig(f"chr{CHR}", genetic_map=GENETIC_MAP, mutation_rate=model.mutation_rate)
@@ -57,13 +53,10 @@ ts = engine.simulate(model, contig, samples)
 print("Simulation finished!")
 del samples
 
-
-# Calculate allele frequencies
 allele_frequencies = []
 for ind, var in tqdm(enumerate(ts.variants())):
     allele_frequencies.append(min(var.frequencies().values()))
 allele_frequencies = np.array(allele_frequencies)
-# Filter the genotype matrix for SNVs with MAF > MIN_MAF
 selected_indices, all_mafs = filter_snps(allele_frequencies, ts, num_to_draw=N_VARIANTS)
 selected_indices = np.sort(selected_indices)
 genotype_matrix = [var.genotypes.astype("int16") for ind, var in enumerate(ts.variants()) if ind in selected_indices]
@@ -71,7 +64,7 @@ genotype_matrix = np.vstack(genotype_matrix).T # new shape: #haplotypes, #varian
 print(f"Variant filtering ended! Variant len: {len(selected_indices)}")
 
 _, u_indices = np.unique(genotype_matrix, axis=0, return_index=True)
-u_indices = np.sort(np.unique(u_indices)) # I suspect indices contain duplicates
+u_indices = np.sort(np.unique(u_indices))
 print(f"Total unique haploids: {len(u_indices)}/{len(genotype_matrix)}")
 
 # Test set generation
@@ -85,8 +78,6 @@ unique_genotype_matrix = genotype_matrix[u_indices]
 TEST_SAMPLE_COUNT = len(u_indices)//2
 print(f"Num test samples will be: {TEST_SAMPLE_COUNT}")
 
-
-# Extract positions and alleles
 positions = []
 refs = []
 alts = []
@@ -97,7 +88,6 @@ for i in selected_indices:
     alt = [mut.derived_state for mut in site.mutations]
     alts.append(alt[0] if alt else 'N')
 
-# Define the VCF header
 vcf_header = [
     '##fileformat=VCFv4.2',
     '##source=stdpopsim',
@@ -107,13 +97,9 @@ vcf_header = [
     # '#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t' + '\t'.join(f"sample{i}" for i in range(ts.genotype_matrix().T[:, selected_indices][unique_indices].shape[0] // 2))
 ]
 
-# Write the VCF file
 with open(f'ceu.model.{DEMO_MODEL}.gmap.{GENETIC_MAP}.chr.{CHR}.{N_SAMPLES}.test.samples.{len(selected_indices)}.snps.biallelic.vcf', 'w') as vcf_file:
-    # Write the header
     for line in vcf_header:
         vcf_file.write(line + '\n')
-
-    # Write the records
     for pos, ref, alt, genotypes in tqdm(zip(positions, refs, alts, unique_genotype_matrix.T)):
         record = [
             f'{CHR}',
@@ -121,7 +107,7 @@ with open(f'ceu.model.{DEMO_MODEL}.gmap.{GENETIC_MAP}.chr.{CHR}.{N_SAMPLES}.test
             f'{CHR}:{pos}:{ref}:{alt}',
             ref,
             alt,
-            '100',  # Dummy quality
+            '100',
             'PASS',
             '.',
             'GT'
@@ -131,7 +117,6 @@ with open(f'ceu.model.{DEMO_MODEL}.gmap.{GENETIC_MAP}.chr.{CHR}.{N_SAMPLES}.test
             record.append(gt)
         vcf_file.write('\t'.join(record) + '\n')
 
-# Training set
 train_indices = np.setdiff1d(np.arange(genotype_matrix.shape[0]), u_indices)
 if len(train_indices) > TRAIN_SAMPLE_COUNT*2:
     train_indices = train_indices[:TRAIN_SAMPLE_COUNT*2]
@@ -141,7 +126,6 @@ if len(train_indices) % 2 == 1:
 TRAIN_SAMPLE_COUNT = len(train_indices)//2
 print(f"TRAIN_SAMPLE_COUNT: {TRAIN_SAMPLE_COUNT}")
 
-# Define the VCF header
 vcf_header = [
     '##fileformat=VCFv4.2',
     '##source=stdpopsim',
@@ -150,13 +134,10 @@ vcf_header = [
     '#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t' + '\t'.join(f"sample{i}" for i in train_indices[::2])
 ]
 
-# Write the VCF file
 with open(f'ceu.model.{DEMO_MODEL}.gmap.{GENETIC_MAP}.chr.{CHR}.{N_SAMPLES}.train.samples.{len(selected_indices)}.snps.biallelic.vcf', 'w') as vcf_file:
-    # Write the header
     for line in vcf_header:
         vcf_file.write(line + '\n')
 
-    # Write the records
     for pos, ref, alt, genotypes in tqdm(zip(positions, refs, alts, genotype_matrix[train_indices].T)):
         record = [
             f'{CHR}',
@@ -164,7 +145,7 @@ with open(f'ceu.model.{DEMO_MODEL}.gmap.{GENETIC_MAP}.chr.{CHR}.{N_SAMPLES}.trai
             f'{CHR}:{pos}:{ref}:{alt}',
             ref,
             alt,
-            '100',  # Dummy quality
+            '100',
             'PASS',
             '.',
             'GT'
