@@ -823,8 +823,8 @@ class DataReader:
 
     def __convert_hap_probs_to_diploid_genotypes(self, allele_probs) -> np.ndarray:
         n_haploids, n_variants, n_alleles = allele_probs.shape
-        squared_allele_probs = allele_probs ** 10  # To reduce entropy
-        normalized_squared_probabilities = squared_allele_probs / np.sum(squared_allele_probs, axis=-1, keepdims=True)
+        # squared_allele_probs = allele_probs ** 10  # To reduce entropy
+        # normalized_squared_probabilities = squared_allele_probs / np.sum(squared_allele_probs, axis=-1, keepdims=True)
 
         if n_haploids % 2 != 0:
             raise ValueError("Number of haploids should be even.")
@@ -834,7 +834,7 @@ class DataReader:
 
         n_samples = n_haploids // 2
         genotypes = np.empty((n_samples, n_variants), dtype=object)
-        haploids_as_diploids = normalized_squared_probabilities.reshape((n_samples, 2, n_variants, -1))
+        haploids_as_diploids = allele_probs.reshape((n_samples, 2, n_variants, -1))
         variant_genotypes = self.map_preds_2_allele(
             np.argmax(haploids_as_diploids, axis=-1))  # (n_haploids, 2, n_variants)
 
@@ -1375,7 +1375,7 @@ def main():
     args = parser.parse_args()
     args.restart_training = str_to_bool(args.restart_training)
     args.use_trt = str_to_bool(args.use_trt)
-    args.use_trt = str_to_bool(args.use_r2)
+    args.use_r2 = str_to_bool(args.use_r2)
     args.tihp = str_to_bool(args.tihp) if args.tihp else args.tihp
     args.ref_vac = str_to_bool(args.ref_vac)
     args.target_vac = str_to_bool(args.target_vac)
