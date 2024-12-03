@@ -1,3 +1,20 @@
+"""
+Copyright (C) <2024>  <Mohammad Erfan Mowlaei>
+Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+    Author email: erfan.molaei@gmail.com 
+"""
+
 '''
 Sample calls:
 python3 STICI_V1.1.py --mode train --which-chunk 1 --save-dir ./alaki --ref ./data/STI_benchmark_datasets/ALL.chr22.training.samples.100k.any.type.0.01.maf.variants.vcf.gz --min-mr 0.85 --max-mr 0.95 --cs 2048 --sites-per-model 10240 --co 64 --na-heads 16 --embed-dim 128 --batch-size-per-gpu 4 --tihp 1 --lr 0.002 --restart-training 1 --verbose 1
@@ -1269,7 +1286,7 @@ def str_to_bool(s):
 
 
 def main():
-    deciding_args_parser = argparse.ArgumentParser(description='ShiLab\'s Imputation model (STI v1.1).', add_help=False)
+    deciding_args_parser = argparse.ArgumentParser(description='ShiLab\'s Imputation model (STICI v1.1).', add_help=False)
 
     ## Function mode
     deciding_args_parser.add_argument('--mode', type=str, help='Operation mode: impute | train (default=train)',
